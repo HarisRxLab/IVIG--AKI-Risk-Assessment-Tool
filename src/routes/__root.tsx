@@ -91,6 +91,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "IVIG-AKI Risk Scoring Tool" },
+      { name: "description", content: "Evidence-based AKI risk stratification for IVIG therapy — KDIGO-aligned, UAE Edition." },
+      { property: "og:description", content: "Evidence-based AKI risk stratification for IVIG therapy — KDIGO-aligned, UAE Edition." },
+      { name: "twitter:description", content: "Evidence-based AKI risk stratification for IVIG therapy — KDIGO-aligned, UAE Edition." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/45fd15fd-764a-44bb-9775-37542931e733/id-preview-0e243525--c06059b4-f891-41e1-97d1-6217aa32ac62.lovable.app-1783441662706.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/45fd15fd-764a-44bb-9775-37542931e733/id-preview-0e243525--c06059b4-f891-41e1-97d1-6217aa32ac62.lovable.app-1783441662706.png" },
     ],
     links: [
       {
