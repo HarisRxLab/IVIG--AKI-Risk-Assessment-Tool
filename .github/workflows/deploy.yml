@@ -22,21 +22,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Build static site
-        run: bunx vite build
-        env:
-          BASE_URL: /IVIG--AKI-Risk-Assessment-Tool/
-
-      - name: Add .nojekyll
-        run: touch .output/public/.nojekyll
+      - name: Prepare site folder
+        run: |
+          mkdir -p _site
+          cp public/ivig-aki.html _site/index.html
+          cp public/favicon.ico _site/favicon.ico
+          touch _site/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -44,7 +35,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .output/public
+          path: _site
 
   deploy:
     environment:
