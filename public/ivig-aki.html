@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>IVIG-AKI Risk Tool v1.2 | UAE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --a:#4361ee;--a2:#7c5cbf;
+  --g:rgba(255,255,255,0.70);--gb:rgba(255,255,255,0.58);
+  --t:#1a1f3c;--t2:#4a5080;--t3:#8890b8;
+  --green:#059669;--gbg:rgba(5,150,105,0.09);
+  --amber:#d97706;--abg:rgba(217,119,6,0.09);
+  --red:#dc2626;--rbg:rgba(220,38,38,0.09);
+  --purple:#7c3aed;--pbg:rgba(124,58,237,0.09);
+  --sh:0 8px 32px rgba(67,97,238,0.11);
+  --tr:all 0.2s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',-apple-system,sans-serif;
+  background:linear-gradient(150deg,#dae5ff 0%,#eeeaff 45%,#e4edff 100%);
+  min-height:100vh;color:var(--t);
+  padding:env(safe-area-inset-top,16px) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+}
+.amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);}
+.o1{width:480px;height:480px;top:-160px;left:-140px;background:radial-gradient(circle,rgba(140,160,255,0.28),transparent 70%);}
+.o2{width:420px;height:420px;bottom:-100px;right:-100px;background:radial-gradient(circle,rgba(180,140,255,0.22),transparent 70%);}
+.o3{width:300px;height:300px;top:38%;left:50%;background:radial-gradient(circle,rgba(160,210,255,0.18),transparent 70%);}
+.wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:18px 14px 52px;}
+.card{
+  background:var(--g);border:1px solid var(--gb);border-radius:22px;
+  backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);
+  box-shadow:var(--sh),0 1px 0 rgba(255,255,255,0.85) inset;
+  margin-bottom:11px;overflow:hidden;
+}
+.hcard{text-align:center;padding:28px 22px 22px;}
+.chip{display:inline-flex;align-items:center;gap:5px;background:rgba(67,97,238,0.09);border:1px solid rgba(67,97,238,0.18);color:var(--a);font-size:0.68em;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;padding:4px 13px;border-radius:20px;margin-bottom:13px;}
+.hcard h1{font-size:1.75em;font-weight:800;letter-spacing:-0.03em;line-height:1.15;margin-bottom:8px;}
+.hcard h1 em{font-style:normal;color:var(--a);}
+.hcard p{font-size:0.80em;color:var(--t2);line-height:1.55;}
+.stat-row{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:15px;}
+.sp{background:rgba(255,255,255,0.82);border:1px solid rgba(67,97,238,0.14);border-radius:20px;padding:4px 13px;font-size:0.71em;font-weight:500;color:var(--t2);}
+.sp b{color:var(--a);}
+.disc{background:rgba(67,97,238,0.05);border:1px solid rgba(67,97,238,0.13);border-radius:12px;padding:10px 14px;font-size:0.75em;color:var(--t2);line-height:1.55;margin-bottom:11px;}
+.disc b{color:var(--a);}
+.sh2{display:flex;align-items:center;gap:11px;padding:16px 18px 0;}
+.snum{width:27px;height:27px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;font-size:0.72em;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(67,97,238,0.30);}
+.stitle{font-size:0.82em;font-weight:700;color:var(--t);}
+.ssub{font-size:0.71em;color:var(--t3);margin-top:1px;}
+.ci{padding:14px 18px 16px;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;}
+.fg:last-child{margin-bottom:0;}
+label{font-size:0.79em;font-weight:600;color:var(--t);}
+.hint{font-size:0.71em;color:var(--t3);font-style:italic;margin-top:2px;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+input,select{font-family:inherit;font-size:0.88em;padding:10px 13px;border:1.5px solid rgba(67,97,238,0.15);border-radius:11px;background:rgba(255,255,255,0.78);color:var(--t);transition:var(--tr);width:100%;-webkit-appearance:none;appearance:none;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%234361ee' d='M5 7L0 2h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;}
+input:focus,select:focus{outline:none;border-color:var(--a);background:rgba(255,255,255,0.96);box-shadow:0 0 0 3px rgba(67,97,238,0.10);}
+optgroup{font-weight:700;color:var(--t2);}
+.pinfo{background:rgba(67,97,238,0.05);border:1px solid rgba(67,97,238,0.13);border-radius:10px;padding:11px 13px;font-size:0.78em;color:var(--t2);line-height:1.65;margin-top:8px;display:none;}
+.pinfo h4{color:var(--a);font-size:1em;margin-bottom:5px;}
+.arow{display:flex;gap:8px;margin-top:6px;}
+.btn{font-family:inherit;font-weight:700;border:none;border-radius:11px;cursor:pointer;transition:var(--tr);font-size:0.86em;padding:12px 14px;}
+.bcalc{flex:2;background:linear-gradient(135deg,#4361ee,#7c5cbf);color:#fff;box-shadow:0 4px 16px rgba(67,97,238,0.28);}
+.bcalc:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(67,97,238,0.36);}
+.breset{flex:1;background:rgba(74,80,128,0.08);color:var(--t2);border:1.5px solid rgba(74,80,128,0.15);}
+.breset:hover{background:rgba(74,80,128,0.15);}
+.bexp{flex:1;background:var(--gbg);color:var(--green);border:1.5px solid rgba(5,150,105,0.20);}
+.bexp:hover{background:rgba(5,150,105,0.16);}
+#resultsCard{display:none;}
+.score-disp{text-align:center;padding:26px 20px 18px;}
+.slbl{font-size:0.68em;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:4px;}
+.snum2{font-size:4.2em;font-weight:800;letter-spacing:-0.05em;line-height:1;color:var(--t);margin-bottom:12px;}
+.risk-pill{display:inline-block;font-size:0.84em;font-weight:700;padding:6px 22px;border-radius:30px;letter-spacing:0.02em;}
+.r-low{background:var(--gbg);color:var(--green);border:1px solid rgba(5,150,105,0.22);}
+.r-mod{background:var(--abg);color:var(--amber);border:1px solid rgba(217,119,6,0.22);}
+.r-high{background:var(--rbg);color:var(--red);border:1px solid rgba(220,38,38,0.22);}
+.r-vhigh{background:var(--pbg);color:var(--purple);border:1px solid rgba(124,58,237,0.22);}
+.rsec{border-top:1px solid rgba(67,97,238,0.07);padding:13px 18px;display:none;}
+.rsec-title{font-size:0.70em;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--a);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.rsec-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(67,97,238,0.15),transparent);}
+.ri{font-size:0.79em;color:var(--t2);padding:5px 0;border-bottom:1px solid rgba(67,97,238,0.05);line-height:1.55;}
+.ri:last-child{border-bottom:none;}
+.ri::before{content:'• ';color:var(--a);font-weight:700;}
+.twrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 18px 16px;}
+table{width:100%;border-collapse:collapse;font-size:0.78em;}
+th{padding:8px 9px;font-size:0.71em;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--t3);border-bottom:1.5px solid rgba(67,97,238,0.12);text-align:left;white-space:nowrap;}
+td{padding:7px 9px;color:var(--t2);border-bottom:1px solid rgba(67,97,238,0.05);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(67,97,238,0.025);}
+td b{color:var(--t);font-weight:600;}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:0.84em;font-weight:700;white-space:nowrap;}
+.b-low{background:var(--gbg);color:var(--green);}
+.b-mod{background:var(--abg);color:var(--amber);}
+.footer-card{text-align:center;padding:18px 20px;margin-top:2px;}
+.footer-card p{font-size:0.73em;color:var(--t3);line-height:1.75;}
+.footer-card p b{color:var(--t2);}
+.builtby{font-size:0.69em;color:var(--t3);margin-top:5px;letter-spacing:0.02em;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(67,97,238,0.20);border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="amb"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div class="wrap">
+
+<div class="card hcard">
+  <div class="chip">⚕&nbsp; Clinical Decision Support</div>
+  <h1>IVIG<em>-AKI</em><br>Risk Scoring Tool</h1>
+  <p>Evidence-based AKI risk stratification for IVIG therapy<br>KDIGO-Aligned &nbsp;·&nbsp; UAE Edition</p>
+  <div class="stat-row">
+    <div class="sp"><b>19</b> IVIG Products</div>
+    <div class="sp"><b>4</b> Risk Tiers</div>
+    <div class="sp"><b>KDIGO</b> Aligned</div>
+  </div>
+</div>
+
+<div class="disc"><b>⚠ Clinical Decision Support Only.</b> Final therapeutic decisions remain with the prescribing clinician. Always follow institutional protocols and apply clinical judgment.</div>
+
+<div class="card">
+  <div class="sh2"><div class="snum">1</div><div><div class="stitle">Patient Information</div><div class="ssub">Demographics &amp; baseline labs</div></div></div>
+  <div class="ci">
+    <div class="two">
+      <div class="fg"><label for="age">Age (years) *</label><input type="number" id="age" placeholder="e.g. 65" min="0" max="120"><span class="hint">≥65 yrs +3 pts · &lt;2 yrs +2 pts</span></div>
+      <div class="fg"><label for="weight">Weight (kg) *</label><input type="number" id="weight" placeholder="e.g. 70" min="1" max="300" step="0.1"><span class="hint">For dose calculation</span></div>
+    </div>
+    <div class="fg"><label for="gender">Gender</label><select id="gender"><option value="">-- Select --</option><option value="M">Male</option><option value="F">Female</option><option value="O">Other</option></select></div>
+    <div class="fg"><label for="baselineCr">Baseline Serum Creatinine (mg/dL) *</label><input type="number" id="baselineCr" placeholder="e.g. 1.0" min="0.1" max="20" step="0.1"><span class="hint">Most recent stable value</span></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="sh2"><div class="snum">2</div><div><div class="stitle">Renal Function</div><div class="ssub">eGFR &amp; CKD staging</div></div></div>
+  <div class="ci">
+    <div class="fg"><label for="egfr">eGFR (mL/min/1.73m²) *</label><input type="number" id="egfr" placeholder="e.g. 45" min="0" max="150"><span class="hint">Stage 3a ≈60 · 3b ≈45 · Stage 4 ≈30 · Stage 5 &lt;15</span></div>
+    <div class="fg"><label for="ckdStage">CKD Stage (optional override)</label>
+      <select id="ckdStage">
+        <option value="">Auto-calculated from eGFR</option>
+        <option value="1">Stage 1 (eGFR ≥90) — 0 pts</option>
+        <option value="2">Stage 2 (eGFR 60-89) — 0 pts</option>
+        <option value="3a">Stage 3a (eGFR 45-59) — +2 pts</option>
+        <option value="3b">Stage 3b (eGFR 30-44) — +3 pts</option>
+        <option value="4">Stage 4 (eGFR 15-29) — +3 pts</option>
+        <option value="5">Stage 5 (eGFR &lt;15) — +3 pts</option>
+      </select>
+    </div>
+    <div class="fg"><label for="priorAKI">Prior AKI or CKD Family History?</label><select id="priorAKI"><option value="0">No</option><option value="2">Yes — +2 pts</option></select></div>
+    <div class="fg"><label for="hydrationStatus">Current Hydration Status</label><select id="hydrationStatus"><option value="0">Euvolemic (Normal)</option><option value="2">Dehydrated — +2 pts</option></select></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="sh2"><div class="snum">3</div><div><div class="stitle">Comorbidities</div><div class="ssub">Diabetes, cardiac, autoimmune &amp; other</div></div></div>
+  <div class="ci">
+    <div class="fg"><label for="diabetes">Diabetes Mellitus?</label><select id="diabetes"><option value="0">No</option><option value="2">Yes — +2 pts</option></select></div>
+    <div class="fg"><label for="htn">Hypertension / CVD?</label><select id="htn"><option value="0">No</option><option value="1">Hypertension only — +1 pt</option><option value="2">CVD / CHF — +2 pts</option></select></div>
+    <div class="fg"><label for="sepsis">Infection / Sepsis?</label><select id="sepsis"><option value="0">No</option><option value="1">Yes — +1 pt</option></select></div>
+    <div class="fg"><label for="paraprotein">Paraproteinemia (MM, Waldenström)?</label><select id="paraprotein"><option value="0">No</option><option value="2">Yes — +2 pts</option></select></div>
+    <div class="fg"><label for="autoimmune">Autoimmune Disease (SLE / Vasculitis)?</label><select id="autoimmune"><option value="0">No</option><option value="1">Yes — +1 pt</option></select></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="sh2"><div class="snum">4</div><div><div class="stitle">Concurrent Medications</div><div class="ssub">Nephrotoxic drug exposure</div></div></div>
+  <div class="ci">
+    <div class="fg"><label for="nephrotoxics">Concomitant Nephrotoxics (NSAIDs / ACEi / ARBs / contrast)?</label><select id="nephrotoxics"><option value="0">None</option><option value="2">One agent — +2 pts</option><option value="3">Multiple agents ("Triple Whammy") — +3 pts</option></select></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="sh2"><div class="snum">5</div><div><div class="stitle">IVIG Product &amp; Dosing</div><div class="ssub">Product, dose &amp; infusion rate</div></div></div>
+  <div class="ci">
+    <div class="fg">
+      <label for="ivigProduct">IVIG Product (UAE Available) *</label>
+      <select id="ivigProduct" onchange="updateProductInfo()">
+        <option value="">-- Select Product --</option>
+        <optgroup label="─── 0 pts – PREFERRED (Glycine / L-Proline) ───">
+          <option value="privigen">Privigen® 10% (L-Proline, 240-440 mOsm/kg) — 0 pts</option>
+          <option value="gamunexc">Gamunex-C® 10% (Glycine, 258 mOsm/kg) — 0 pts</option>
+          <option value="intratect">Intratect® 5-10% (Glycine, 250-350 mOsm/kg) — 0 pts</option>
+          <option value="immunorel10">ImmunoRel® 10% (Glycine) — 0 pts</option>
+          <option value="flebogamma5">Flebogamma® DIF 5% (Glycine) — 0 pts</option>
+          <option value="flebogamma10">Flebogamma® DIF 10% (Glycine) — 0 pts</option>
+          <option value="gammagard">Gammagard Liquid® 10% (Glycine) — 0 pts</option>
+          <option value="gammaked">Gammaked® 10% (Glycine) — 0 pts</option>
+          <option value="bivigam">Bivigam® 10% (Glycine) — 0 pts</option>
+          <option value="asceniv">Asceniv® 10% (Glycine) — 0 pts</option>
+          <option value="alyglo">Alyglo® 10% (Glycine) — 0 pts</option>
+          <option value="panzyga">Panzyga® 10% (Glycine) — 0 pts</option>
+          <option value="kiovig">Kiovig® 10% (Glycine) — 0 pts</option>
+          <option value="yimmugo">Yimmugo® 10% (Glycine) — 0 pts</option>
+          <option value="iqymune">IQYMUNE® 10% (Glycine) — 0 pts</option>
+        </optgroup>
+        <optgroup label="─── 2 pts – CAUTION (Maltose) ───">
+          <option value="immunorel5">ImmunoRel® 5% (Maltose, 310-380 mOsm/kg) — 2 pts</option>
+          <option value="globucel">Globucel VF® 5% (Maltose, 310-380 mOsm/kg) — 2 pts</option>
+          <option value="octagam5">Octagam® 5% (Maltose) — 2 pts</option>
+          <option value="octagam10">Octagam® 10% (Maltose) — 2 pts</option>
+        </optgroup>
+      </select>
+      <div class="pinfo" id="productInfo"></div>
+    </div>
+    <div class="fg"><label for="dose">Total IVIG Dose (g/kg)</label><input type="number" id="dose" placeholder="e.g. 2.0" min="0.4" max="2.5" step="0.1"><span class="hint">Standard: 0.4-2.0 g/kg · High dose &gt;2 g/kg adds +2 pts</span></div>
+    <div class="fg"><label for="infusionRate">Infusion Rate (mg/kg/min)</label><select id="infusionRate"><option value="0">≤2 mg/kg/min — Standard</option><option value="2">&gt;2 mg/kg/min — Rapid (+2 pts)</option></select></div>
+    <div class="arow">
+      <button class="btn bcalc" onclick="calculateRisk()">⚡ Calculate Risk</button>
+      <button class="btn breset" onclick="resetForm()">↺ Reset</button>
+      <button class="btn bexp" onclick="exportReport()">↓ Export</button>
+    </div>
+  </div>
+</div>
+
+<div class="card" id="resultsCard">
+  <div class="score-disp">
+    <div class="slbl">AKI Risk Score</div>
+    <div class="snum2" id="scoreNumber">—</div>
+    <div id="riskCategory"></div>
+  </div>
+  <div class="rsec" id="secBreakdown"><div class="rsec-title">📊 Score Breakdown</div><div id="cBreakdown"></div></div>
+  <div class="rsec" id="secHyd"><div class="rsec-title">💧 Hydration Protocol</div><div id="cHyd"></div></div>
+  <div class="rsec" id="secPre"><div class="rsec-title">💊 Pre-medication</div><div id="cPre"></div></div>
+  <div class="rsec" id="secMon"><div class="rsec-title">🔍 Monitoring</div><div id="cMon"></div></div>
+  <div class="rsec" id="secProd"><div class="rsec-title">📦 Product Recommendation</div><div id="cProd"></div></div>
+  <div class="rsec" id="secAct"><div class="rsec-title">✅ Action Items</div><div id="cAct"></div></div>
+</div>
+
+<div class="card">
+  <div class="sh2" style="padding-bottom:12px;">
+    <div class="snum" style="background:linear-gradient(135deg,#059669,#0891b2);font-size:0.9em;">📦</div>
+    <div><div class="stitle">UAE IVIG Product Database</div><div class="ssub">19 products · stabilizer · osmolality · AKI risk</div></div>
+  </div>
+  <div class="twrap">
+    <table>
+      <thead><tr><th>Product</th><th>Stabilizer</th><th>Osmolality</th><th>Risk</th></tr></thead>
+      <tbody><tr><td><b>Privigen® 10%</b></td><td>L-Proline</td><td>240-440</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Gamunex-C® 10%</b></td><td>Glycine</td><td>258</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Intratect® 5-10%</b></td><td>Glycine</td><td>250-350</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>ImmunoRel® 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Flebogamma® DIF 5%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Flebogamma® DIF 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Gammagard Liquid® 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Gammaked® 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Bivigam® 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Asceniv® 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Alyglo® 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Panzyga® 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Kiovig® 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>Yimmugo® 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>IQYMUNE® 10%</b></td><td>Glycine</td><td>TBD</td><td><span class="badge b-low">0 pts</span></td></tr>
+<tr><td><b>ImmunoRel® 5%</b></td><td>Maltose</td><td>310-380</td><td><span class="badge b-mod">2 pts</span></td></tr>
+<tr><td><b>Globucel VF® 5%</b></td><td>Maltose</td><td>310-380</td><td><span class="badge b-mod">2 pts</span></td></tr>
+<tr><td><b>Octagam® 5%</b></td><td>Maltose</td><td>TBD</td><td><span class="badge b-mod">2 pts</span></td></tr>
+<tr><td><b>Octagam® 10%</b></td><td>Maltose</td><td>TBD</td><td><span class="badge b-mod">2 pts</span></td></tr>
+</tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card footer-card">
+  <p><b>IVIG-AKI Risk Scoring Tool v1.2 | UAE Edition</b></p>
+  <p>Designed for clinical pharmacists, nephrologists, and internists in UAE healthcare settings.</p>
+  <p><em>This is a clinical decision support tool only. Final therapeutic decisions remain with the prescribing clinician. Always follow institutional protocols and perform clinical judgment.</em></p>
+  <p>© 2026 Clinical Pharmacy Decision Support | Evidence-Based | KDIGO-Aligned</p>
+  <p class="builtby">Built by Haris Mohamed K M</p>
+</div>
+
+</div>
+<script>
+
+        // Product Database
+        const products = {
+            privigen:{name:'Privigen® 10%',stabilizer:'L-Proline',osmolality:'240-440 mOsm/kg',points:0,igA:'<=25 ug/mL',concentration:'10% (100 g/L)',advantages:'Physiologic osmolality, excellent for CKD/elderly, minimal sodium (8 mEq/L)',risk:'Lowest risk - PREFERRED'},
+            gamunexc:{name:'Gamunex-C® 10%',stabilizer:'Glycine',osmolality:'258 mOsm/kg',points:0,igA:'46 ug/mL',concentration:'10% (100 g/L)',advantages:'Highest IgG concentration, lowest osmolality, safe in all populations',risk:'Lowest risk - PREFERRED'},
+            intratect:{name:'Intratect® 5-10%',stabilizer:'Glycine',osmolality:'250-350 mOsm/kg',points:0,igA:'<=2 mg/mL',concentration:'5% & 10%',advantages:'Excellent UAE availability, EU manufacture standards, physiologic osmolality',risk:'Lowest risk - PREFERRED'},
+            immunorel10:{name:'ImmunoRel® 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'TBD',concentration:'10% (100 g/L)',advantages:'Glycine-stabilized 10%; lower AKI risk than 5% maltose version',risk:'Lowest risk - PREFERRED'},
+            flebogamma5:{name:'Flebogamma® DIF 5%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'<=50 ug/mL',concentration:'5% (50 g/L)',advantages:'Glycine-stabilized, sucrose-free; established safety record',risk:'Lowest risk - PREFERRED'},
+            flebogamma10:{name:'Flebogamma® DIF 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'<=50 ug/mL',concentration:'10% (100 g/L)',advantages:'Glycine-stabilized, sucrose-free; ideal for fluid-restricted patients',risk:'Lowest risk - PREFERRED'},
+            gammagard:{name:'Gammagard Liquid® 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'37 ug/mL',concentration:'10% (100 g/L)',advantages:'Sucrose-free, glycine-stabilized; FDA-approved for PID and MMN',risk:'Lowest risk - PREFERRED'},
+            gammaked:{name:'Gammaked® 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'46 ug/mL',concentration:'10% (100 g/L)',advantages:'Glycine-stabilized; therapeutically equivalent to Gamunex-C',risk:'Lowest risk - PREFERRED'},
+            bivigam:{name:'Bivigam® 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'<=200 ug/mL',concentration:'10% (100 g/L)',advantages:'Glycine and human albumin stabilized; sucrose-free',risk:'Lowest risk - PREFERRED'},
+            asceniv:{name:'Asceniv® 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'TBD',concentration:'10% (100 g/L)',advantages:'Glycine-stabilized, sucrose-free; enriched RSV neutralizing antibodies',risk:'Lowest risk - PREFERRED'},
+            alyglo:{name:'Alyglo® 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'TBD',concentration:'10% (100 g/L)',advantages:'Glycine-stabilized, sucrose-free; newer formulation',risk:'Lowest risk - PREFERRED'},
+            panzyga:{name:'Panzyga® 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'<=200 ug/mL',concentration:'10% (100 g/L)',advantages:'Glycine-stabilized, sucrose-free; Octapharma manufacture',risk:'Lowest risk - PREFERRED'},
+            kiovig:{name:'Kiovig® 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'37 ug/mL',concentration:'10% (100 g/L)',advantages:'Glycine-stabilized, sucrose-free; widely used in EU/Middle East (Takeda)',risk:'Lowest risk - PREFERRED'},
+            yimmugo:{name:'Yimmugo® 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'TBD',concentration:'10% (100 g/L)',advantages:'Glycine-stabilized, sucrose-free; newer market entrant',risk:'Lowest risk - PREFERRED'},
+            iqymune:{name:'IQYMUNE® 10%',stabilizer:'Glycine',osmolality:'TBD',points:0,igA:'TBD',concentration:'10% (100 g/L)',advantages:'Glycine-stabilized, sucrose-free; LFB Biopharmaceuticals manufacture',risk:'Lowest risk - PREFERRED'},
+            immunorel5:{name:'ImmunoRel® 5%',stabilizer:'Maltose',osmolality:'310-380 mOsm/kg',points:2,igA:'<=80 ug/mL',concentration:'5% (50 g/L)',advantages:'Lower cost; maltose safer than sucrose but monitor renal function closely',risk:'Moderate - CAUTION in CKD'},
+            globucel:{name:'Globucel VF® 5%',stabilizer:'Maltose',osmolality:'310-380 mOsm/kg',points:2,igA:'<=70 ug/mL',concentration:'5% & 10%',advantages:'Most cost-effective, GCC availability',risk:'Moderate - CAUTION in CKD'},
+            octagam5:{name:'Octagam® 5%',stabilizer:'Maltose',osmolality:'TBD',points:2,igA:'<=200 ug/mL',concentration:'5% (50 g/L)',advantages:'Maltose-stabilized; caution with point-of-care glucose monitors',risk:'Moderate - CAUTION in CKD'},
+            octagam10:{name:'Octagam® 10%',stabilizer:'Maltose',osmolality:'TBD',points:2,igA:'<=200 ug/mL',concentration:'10% (100 g/L)',advantages:'Higher concentration maltose; caution with point-of-care glucose monitors',risk:'Moderate - CAUTION in CKD'}
+        };
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Update button states
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function updateProductInfo() {
+            const productSelect = document.getElementById('ivigProduct');
+            const productInfo = document.getElementById('productInfo');
+            const selected = productSelect.value;
+
+            if (selected && products[selected]) {
+                const product = products[selected];
+                productInfo.innerHTML = `
+                    <h4>${product.name}</h4>
+                    <p><strong>Stabilizer:</strong> ${product.stabilizer}</p>
+                    <p><strong>Osmolality:</strong> ${product.osmolality}</p>
+                    <p><strong>Risk:</strong> <strong style="color: ${product.points === 0 ? 'green' : 'orange'}">${product.risk}</strong></p>
+                    <p><strong>Advantages:</strong> ${product.advantages}</p>
+                `;
+                productInfo.style.display = 'block';
+            } else {
+                productInfo.style.display = 'none';
+            }
+        }
+
+        function calculateRisk() {
+            // Collect all inputs
+            const age = parseInt(document.getElementById('age').value) || 0;
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const baselineCr = parseFloat(document.getElementById('baselineCr').value) || 0.8;
+            const egfr = parseInt(document.getElementById('egfr').value) || 90;
+            const priorAKI = parseInt(document.getElementById('priorAKI').value) || 0;
+            const hydration = parseInt(document.getElementById('hydrationStatus').value) || 0;
+            const diabetes = parseInt(document.getElementById('diabetes').value) || 0;
+            const htn = parseInt(document.getElementById('htn').value) || 0;
+            const sepsis = parseInt(document.getElementById('sepsis').value) || 0;
+            const paraprotein = parseInt(document.getElementById('paraprotein').value) || 0;
+            const autoimmune = parseInt(document.getElementById('autoimmune').value) || 0;
+            const nephrotoxics = parseInt(document.getElementById('nephrotoxics').value) || 0;
+            const ivigProductKey = document.getElementById('ivigProduct').value;
+            const dose = parseFloat(document.getElementById('dose').value) || 2.0;
+            const infusionRate = parseInt(document.getElementById('infusionRate').value) || 0;
+
+            // Validation
+            if (!age || !weight || !egfr || !ivigProductKey) {
+                alert('Please fill in required fields (marked with *)');
+                return;
+            }
+
+            // Calculate score
+            let score = 0;
+            let breakdown = [];
+
+            // Demographics
+            if (age >= 65) {
+                score += 3;
+                breakdown.push(`Age ≥65 years: +3 pts`);
+            } else if (age < 2) {
+                score += 2;
+                breakdown.push(`Age <2 years (pediatric): +2 pts`);
+            }
+
+            // Renal baseline
+            let renalScore = 0;
+            if (egfr < 30) {
+                renalScore = 3;
+                breakdown.push(`CKD Stage 4–5 (eGFR <30): +3 pts`);
+            } else if (egfr < 60) {
+                renalScore = 3;
+                breakdown.push(`CKD Stage 3 (eGFR 30–59): +3 pts`);
+            }
+            score += renalScore;
+
+            if (baselineCr > 1.5) {
+                score += 3;
+                breakdown.push(`Baseline Cr >1.5× ULN: +3 pts`);
+            }
+
+            score += priorAKI;
+            if (priorAKI > 0) breakdown.push(`Prior AKI/CKD family history: +${priorAKI} pts`);
+
+            // Comorbidities
+            score += diabetes;
+            if (diabetes > 0) breakdown.push(`Diabetes mellitus: +${diabetes} pts`);
+
+            score += htn;
+            if (htn > 0) breakdown.push(`Hypertension/CVD: +${htn} pts`);
+
+            score += sepsis;
+            if (sepsis > 0) breakdown.push(`Infection/Sepsis: +${sepsis} pts`);
+
+            score += paraprotein;
+            if (paraprotein > 0) breakdown.push(`Paraproteinemia: +${paraprotein} pts`);
+
+            score += autoimmune;
+            if (autoimmune > 0) breakdown.push(`Autoimmune disease: +${autoimmune} pts`);
+
+            score += nephrotoxics;
+            if (nephrotoxics > 0) breakdown.push(`Concomitant nephrotoxics: +${nephrotoxics} pts`);
+
+            score += hydration;
+            if (hydration > 0) breakdown.push(`Dehydration: +${hydration} pts`);
+
+            // IVIG Product
+            const product = products[ivigProductKey];
+            score += product.points;
+            if (product.points > 0) breakdown.push(`${product.name} (${product.stabilizer}, ${product.points} pts): +${product.points} pts`);
+
+            // Dose
+            if (dose > 2.0) {
+                score += 2;
+                breakdown.push(`High IVIG dose (>2 g/kg): +2 pts`);
+            }
+
+            // Infusion rate
+            score += infusionRate;
+            if (infusionRate > 0) breakdown.push(`Rapid infusion (>2 mg/kg/min): +${infusionRate} pts`);
+
+            // Display results
+            displayResults(score, breakdown, product, age, egfr, diabetes, baselineCr);
+        }
+
+        function displayResults(score, breakdown, product, age, egfr, diabetes, baselineCr) {
+            document.getElementById('scoreNumber').textContent = score;
+            var cat,hydP,preP,monP,pRec,acts,rCls;
+            if(score<=5){cat='LOW RISK';rCls='r-low';
+                hydP='Encourage oral fluids (2-3 L/day)|No IV pre-hydration required';
+                preP='None standard|Paracetamol available for fever/chills';
+                monP='Baseline serum creatinine only|Repeat only if symptoms develop';
+                pRec='Any product acceptable; glycine-stabilized formulations preferred.';
+                acts='Standard infusion protocol|Monitor for adverse reactions';
+            } else if(score<=10){cat='MODERATE RISK';rCls='r-mod';
+                hydP='500 mL 0.9% NaCl IV over 30-60 min before IVIG|500 mL 0.9% NaCl IV 2-4h post-infusion|UAE heat: add 250 mL in summer';
+                preP='Paracetamol 500-650 mg q4-6h if indicated|Diphenhydramine 25-50 mg q4-6h if chills occur';
+                monP='Baseline + 24h post-infusion serum creatinine|Urine output q8h (target >=0.5 mL/kg/h)';
+                pRec=egfr>=60?'Any glycine/proline-stabilized product preferred; maltose-stabilized acceptable with close monitoring.':'Glycine/proline-stabilized mandatory; avoid maltose-stabilized if possible.';
+                acts='Pre-hydration mandatory|Monitor Cr at 24h post-IVIG|Slow infusion rate (0.8-1.4 mg/kg/min)';
+            } else if(score<=15){cat='HIGH RISK';rCls='r-high';
+                hydP='1000 mL 0.9% NaCl IV over 60-90 min before IVIG|Target urine output >=1 mL/kg/h pre-infusion|Continue saline during infusion|500 mL post-infusion (summer: 750 mL)';
+                preP='Mandatory: Paracetamol 500-650 mg q4-6h|Mandatory: Diphenhydramine 25-50 mg q4-6h|Consider: Methylprednisolone 0.5-1 mg/kg IV q12h|AVOID NSAIDs and ACEi/ARBs';
+                monP='Baseline + q12h Cr for 72 hours|Urine output q6h; electrolytes q24h|Urine dipstick for hematuria/proteinuria|Daily weight and fluid balance';
+                pRec='STRONGLY PREFER: Glycine/proline-stabilized (Privigen, Gamunex-C, Intratect, Kiovig, Flebogamma, Panzyga, etc.). AVOID: Maltose-stabilized unless no alternative. NEVER: Sucrose.';
+                acts='Intensive pre-hydration (1L NS)|Slow infusion: 0.8-1.4 mg/kg/min (4-6h for 2g/kg)|Consider dose splitting (1 g/kg x 2 days)|Nephrology consult recommended';
+            } else {cat='VERY HIGH RISK';rCls='r-vhigh';
+                hydP='1000-2000 mL 0.9% NaCl IV over 90-120 min|ICU hemodynamic monitoring strongly recommended|Continuous crystalloid during IVIG|1000 mL post-infusion; titrate to UOP >=0.5 mL/kg/h';
+                preP='Mandatory: Paracetamol 500-650 mg q4-6h|Mandatory: Diphenhydramine 25-50 mg q4-6h|Strongly consider: Methylprednisolone 0.5-1 mg/kg IV q12h|ABSOLUTELY AVOID: NSAIDs, ACEi/ARBs, contrast agents';
+                monP='ICU admission strongly advised|Cr q4-6h; UOP q1-2h (foley)|BUN, electrolytes, LDH q12h|Renal ultrasound pre/post-infusion|Dialysis standby; notify nephrology & ICU';
+                pRec='CRITICAL: ONLY glycine/proline-stabilized products (Privigen, Gamunex-C, Intratect, Kiovig, Flebogamma, Panzyga, etc.). CONSIDER: SCIG, rituximab, plasma exchange. ABORT if UOP <0.3 mL/kg/h or Cr rise >0.5 mg/dL/4h.';
+                acts='ICU admission mandatory|Nephrology consultation URGENT|Infusion: <=0.8 mg/kg/min (6-8+ hours)|Dose splitting over 4-5 days|Dialysis standby|Daily Cr follow-up 1 month post-IVIG';
+            }
+            document.getElementById('riskCategory').innerHTML='<span class="risk-pill '+rCls+'">'+cat+'</span>';
+            function fill(sid,cid,txt){
+                var s=document.getElementById(sid),c=document.getElementById(cid);
+                if(!s||!c)return;
+                c.innerHTML=txt.split('|').map(function(l){return'<div class="ri">'+l+'</div>';}).join('');
+                s.style.display='block';
+            }
+            fill('secBreakdown','cBreakdown',breakdown.join('|'));
+            fill('secHyd','cHyd',hydP); fill('secPre','cPre',preP);
+            fill('secMon','cMon',monP); fill('secProd','cProd',pRec); fill('secAct','cAct',acts);
+            var rc=document.getElementById('resultsCard');
+            rc.style.display='block';
+            rc.scrollIntoView({behavior:'smooth',block:'start'});
+        }
+        function resetForm() {
+            document.querySelectorAll('input, select').forEach(elem => {
+                if (elem.type === 'number') elem.value = '';
+                else elem.value = '';
+            });
+            document.getElementById('noScore').style.display = 'block';
+            document.getElementById('riskResult').style.display = 'none';
+            document.getElementById('scoreBreakdown').style.display = 'none';
+        }
+
+        function exportReport() {
+            const score = document.getElementById('scoreDisplay').textContent;
+            const category = document.querySelector('.risk-category').textContent;
+
+            const reportText = `IVIG-AKI RISK SCORING REPORT
+════════════════════════════════════
+Generated: ${new Date().toLocaleString()}
+
+RISK SCORE: ${score}
+RISK CATEGORY: ${category}
+
+HYDRATION PROTOCOL:
+${document.getElementById('hydrationText').textContent}
+
+PREMEDICATION PROTOCOL:
+${document.getElementById('premedText').textContent}
+
+MONITORING PROTOCOL:
+${document.getElementById('monitoringText').textContent}
+
+PRODUCT RECOMMENDATION:
+${document.getElementById('productRecText').textContent}
+
+ACTION ITEMS:
+${document.getElementById('actionItemsList').textContent}
+
+════════════════════════════════════
+DISCLAIMER: This is a clinical decision support tool only. Final therapeutic decisions remain with the prescribing clinician.
+`;
+
+            const blob = new Blob([reportText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `IVIG_AKI_Report_${new Date().getTime()}.txt`;
+            link.click();
+        }
+    
+</script>
+</body>
+</html>
